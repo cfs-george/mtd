@@ -9,32 +9,63 @@
       h1 { text-align: center; }
       .tabs { display: flex; margin-bottom: 20px; cursor: pointer; }
       .tab { padding: 10px 20px; background: #ddd; margin-right: 5px; border-radius: 5px 5px 0 0; }
-      .tab.active { background: #4CAF50; color: white; }
+      .tab.active { background: #6CA5AC; color: white; }
       .tab-content { background: white; padding: 20px; border-radius: 0 5px 5px 5px; }
       table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
       th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ccc; }
       input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 5px; box-sizing: border-box; }
-      button { padding: 8px 12px; margin-top: 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }
-      button:hover { background: #45a049; }
+      button { padding: 8px 12px; margin-top: 10px; background: #6CA5AC; color: white; border: none; border-radius: 3px; cursor: pointer; }
+      button:hover { background: #91e5f0; }
       .summary { font-weight: bold; font-size: 1.2em; margin-top: 10px; }
+      .profile-field { margin-bottom: 10px; }
     </style>
   </head>
   <body>
-    <h1>MTD Prototype</h1>
+    <h1>MTD Prototype (2026)</h1>
 
     <div class="tabs">
-      <div class="tab active" onclick="showTab('income')">Income</div>
+      <div class="tab active" onclick="showTab('profile')">Business Profile</div>
+      <div class="tab" onclick="showTab('income')">Income</div>
       <div class="tab" onclick="showTab('expenses')">Expenses</div>
       <div class="tab" onclick="showTab('summary')">Summary</div>
     </div>
 
-    <div id="income" class="tab-content">
+    <!-- Business Profile -->
+    <div id="profile" class="tab-content">
+      <div class="profile-field">
+        <label>Business Name:</label>
+        <input type="text" id="business-name" placeholder="My Business Ltd">
+      </div>
+      <div class="profile-field">
+        <label>Business Type:</label>
+        <select id="business-type">
+          <option value="Sole Trader">Sole Trader</option>
+          <option value="Landlord">Landlord</option>
+        </select>
+      </div>
+      <div class="profile-field">
+        <label>Accounting Basis:</label>
+        <select id="accounting-basis">
+          <option value="Cash">Cash</option>
+          <option value="Accrual">Accrual</option>
+        </select>
+      </div>
+      <div class="profile-field">
+        <label>Accounting Period Start:</label>
+        <input type="date" id="period-start" value="2026-04-06">
+      </div>
+      <button onclick="saveProfile()">Save Profile</button>
+    </div>
+
+    <!-- Income -->
+    <div id="income" class="tab-content" style="display:none;">
       <table id="income-table">
         <tr>
           <th>Date</th>
           <th>Description</th>
           <th>Category</th>
           <th>Amount (£)</th>
+          <th>VAT?</th>
         </tr>
       </table>
       <input type="date" id="income-date">
@@ -45,9 +76,11 @@
         <option value="Other">Other</option>
       </select>
       <input type="number" id="income-amount" placeholder="Amount">
+      <label><input type="checkbox" id="income-vat"> VAT Applied</label>
       <button onclick="addIncome()">Add Income</button>
     </div>
 
+    <!-- Expenses -->
     <div id="expenses" class="tab-content" style="display:none;">
       <table id="expense-table">
         <tr>
@@ -55,6 +88,7 @@
           <th>Description</th>
           <th>Category</th>
           <th>Amount (£)</th>
+          <th>VAT?</th>
         </tr>
       </table>
       <input type="date" id="expense-date">
@@ -66,18 +100,32 @@
         <option value="Other">Other</option>
       </select>
       <input type="number" id="expense-amount" placeholder="Amount">
+      <label><input type="checkbox" id="expense-vat"> VAT Applied</label>
       <button onclick="addExpense()">Add Expense</button>
     </div>
 
+    <!-- Summary -->
     <div id="summary" class="tab-content" style="display:none;">
+      <label>Select Quarter:</label>
+      <select id="quarter-select" onchange="updateSummary()">
+        <option value="all">Full Year</option>
+        <option value="Q1">Q1 (6 Apr – 5 Jul)</option>
+        <option value="Q2">Q2 (6 Jul – 5 Oct)</option>
+        <option value="Q3">Q3 (6 Oct – 5 Jan)</option>
+        <option value="Q4">Q4 (6 Jan – 5 Apr)</option>
+      </select>
+
       <div class="summary">
         Total Income: £<span id="total-income">0.00</span><br>
         Total Expenses: £<span id="total-expenses">0.00</span><br>
         Net Profit: £<span id="net-profit">0.00</span>
       </div>
+
+      <button onclick="generateQuarterlyUpdate()">Generate Quarterly Update</button>
     </div>
 
     <script>
+      // ---- Tab handling ----
       function showTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(tc => tc.style.display = 'none');
         document.getElementById(tabName).style.display = 'block';
@@ -85,23 +133,36 @@
         document.querySelector('.tab[onclick*="' + tabName + '"]').classList.add('active');
       }
 
-      let incomes = [];
-      let expenses = [];
+      // ---- Data stores ----
+      let incomes = JSON.parse(localStorage.getItem('incomes') || '[]');
+      let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+      let businessProfile = JSON.parse(localStorage.getItem('businessProfile') || '{}');
 
+      // ---- Business profile ----
+      function saveProfile() {
+        businessProfile = {
+          name: document.getElementById('business-name').value,
+          type: document.getElementById('business-type').value,
+          basis: document.getElementById('accounting-basis').value,
+          periodStart: document.getElementById('period-start').value
+        };
+        localStorage.setItem('businessProfile', JSON.stringify(businessProfile));
+        alert('Profile saved');
+      }
+
+      // ---- Add income / expense ----
       function addIncome() {
         const date = document.getElementById('income-date').value;
         const desc = document.getElementById('income-desc').value;
         const cat = document.getElementById('income-cat').value;
         const amount = parseFloat(document.getElementById('income-amount').value) || 0;
+        const vat = document.getElementById('income-vat').checked;
         if (!date || !desc || !amount) return alert('Fill all fields');
 
-        incomes.push({ date, desc, cat, amount });
-        const table = document.getElementById('income-table');
-        const row = table.insertRow();
-        row.insertCell(0).innerText = date;
-        row.insertCell(1).innerText = desc;
-        row.insertCell(2).innerText = cat;
-        row.insertCell(3).innerText = amount.toFixed(2);
+        const record = { date, desc, cat, amount, vat };
+        incomes.push(record);
+        localStorage.setItem('incomes', JSON.stringify(incomes));
+        addRow('income-table', record);
         updateSummary();
       }
 
@@ -110,25 +171,78 @@
         const desc = document.getElementById('expense-desc').value;
         const cat = document.getElementById('expense-cat').value;
         const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+        const vat = document.getElementById('expense-vat').checked;
         if (!date || !desc || !amount) return alert('Fill all fields');
 
-        expenses.push({ date, desc, cat, amount });
-        const table = document.getElementById('expense-table');
-        const row = table.insertRow();
-        row.insertCell(0).innerText = date;
-        row.insertCell(1).innerText = desc;
-        row.insertCell(2).innerText = cat;
-        row.insertCell(3).innerText = amount.toFixed(2);
+        const record = { date, desc, cat, amount, vat };
+        expenses.push(record);
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+        addRow('expense-table', record);
         updateSummary();
       }
 
+      // ---- Add row to table ----
+      function addRow(tableId, record) {
+        const table = document.getElementById(tableId);
+        const row = table.insertRow();
+        row.insertCell(0).innerText = record.date;
+        row.insertCell(1).innerText = record.desc;
+        row.insertCell(2).innerText = record.cat;
+        row.insertCell(3).innerText = record.amount.toFixed(2);
+        row.insertCell(4).innerText = record.vat ? 'Yes' : 'No';
+      }
+
+      // ---- Calculate and update summary ----
       function updateSummary() {
-        const totalIncome = incomes.reduce((a, b) => a + b.amount, 0);
-        const totalExpenses = expenses.reduce((a, b) => a + b.amount, 0);
+        const quarter = document.getElementById('quarter-select').value;
+        const filteredIncome = filterByQuarter(incomes, quarter);
+        const filteredExpenses = filterByQuarter(expenses, quarter);
+        const totalIncome = filteredIncome.reduce((a, b) => a + b.amount, 0);
+        const totalExpenses = filteredExpenses.reduce((a, b) => a + b.amount, 0);
         document.getElementById('total-income').innerText = totalIncome.toFixed(2);
         document.getElementById('total-expenses').innerText = totalExpenses.toFixed(2);
         document.getElementById('net-profit').innerText = (totalIncome - totalExpenses).toFixed(2);
       }
+
+      function filterByQuarter(records, quarter) {
+        if (quarter === 'all') return records;
+        const qRanges = {
+          Q1: ['04-06', '07-05'],
+          Q2: ['07-06', '10-05'],
+          Q3: ['10-06', '01-05'],
+          Q4: ['01-06', '04-05']
+        };
+        const [start, end] = qRanges[quarter];
+        return records.filter(r => {
+          const monthDay = r.date.slice(5);
+          if (quarter === 'Q3') return (monthDay >= '10-06' || monthDay <= '01-05');
+          if (quarter === 'Q4') return (monthDay >= '01-06' || monthDay <= '04-05');
+          return monthDay >= start && monthDay <= end;
+        });
+      }
+
+      // ---- Generate quarterly update ----
+      function generateQuarterlyUpdate() {
+        const quarter = document.getElementById('quarter-select').value;
+        const payload = {
+          business: businessProfile,
+          quarter,
+          totals: {
+            income: document.getElementById('total-income').innerText,
+            expenses: document.getElementById('total-expenses').innerText,
+            profit: document.getElementById('net-profit').innerText
+          },
+          timestamp: new Date().toISOString()
+        };
+        alert("Quarterly Update JSON:\n\n" + JSON.stringify(payload, null, 2));
+      }
+
+      // ---- Load data from localStorage ----
+      window.onload = () => {
+        incomes.forEach(i => addRow('income-table', i));
+        expenses.forEach(e => addRow('expense-table', e));
+        updateSummary();
+      };
     </script>
   </body>
 </html>
