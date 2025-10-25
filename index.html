@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MTD Prototype</title>
+  <title>MTD Simple Prototype</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
     }
 
     button {
-      background: #0078d4;
+      background: #6CA5AC;
       border: none;
       color: white;
       padding: 8px 14px;
@@ -36,16 +36,11 @@
       transition: background 0.3s;
     }
     button:hover {
-      background: #005a9e;
-    }
-
-    h2 {
-      border-bottom: 2px solid #ccc;
-      padding-bottom: 6px;
+      background: #91e5f0;
     }
 
     .section {
-      margin-bottom: 30px;
+      margin-top: 20px;
       background: white;
       padding: 16px;
       border-radius: 10px;
@@ -59,10 +54,10 @@
 
     input, select {
       padding: 6px;
-      margin: 6px;
+      margin: 6px 0;
       border: 1px solid #ccc;
       border-radius: 4px;
-      width: calc(100% - 20px);
+      width: 100%;
       box-sizing: border-box;
       background: #fff;
       color: #000;
@@ -95,6 +90,54 @@
       font-weight: bold;
       margin-top: 10px;
     }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      background: #e9ecef;
+      margin-right: 5px;
+      transition: background 0.2s;
+    }
+
+    .tab:hover {
+      background: #d7dde3;
+    }
+
+    .tab.active {
+      background: white;
+      border-bottom: 2px solid white;
+      font-weight: bold;
+    }
+
+    .dark-mode .tab {
+      background: #2a2a2a;
+      color: #ddd;
+      border-color: #444;
+    }
+
+    .dark-mode .tab.active {
+      background: #1e1e1e;
+      border-bottom: 2px solid #1e1e1e;
+      color: #fff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
   </style>
 </head>
 <body>
@@ -103,7 +146,14 @@
     <button id="darkModeToggle">🌙 Dark Mode</button>
   </header>
 
-  <section class="section">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('profile')">Business Profile</div>
+    <div class="tab" onclick="showTab('income')">Income</div>
+    <div class="tab" onclick="showTab('expenses')">Expenses</div>
+    <div class="tab" onclick="showTab('summary')">Summary</div>
+  </div>
+
+  <section id="profile" class="section tab-content active">
     <h2>Business Profile</h2>
     <div id="profileDisplay">
       <p><strong>Business Name:</strong> <span id="displayName">Not set</span></p>
@@ -118,7 +168,7 @@
     </form>
   </section>
 
-  <section class="section">
+  <section id="income" class="section tab-content">
     <h2>Record Income</h2>
     <form id="incomeForm">
       <input type="date" id="incomeDate" required />
@@ -137,7 +187,7 @@
     </table>
   </section>
 
-  <section class="section">
+  <section id="expenses" class="section tab-content">
     <h2>Record Expense</h2>
     <form id="expenseForm">
       <input type="date" id="expenseDate" required />
@@ -157,7 +207,7 @@
     </table>
   </section>
 
-  <section class="section">
+  <section id="summary" class="section tab-content">
     <h2>Summary</h2>
     <div class="summary">
       Total Income: £<span id="totalIncome">0</span><br>
@@ -179,6 +229,13 @@
 
     let totalIncome = 0;
     let totalExpenses = 0;
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
+      document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
 
     incomeForm.addEventListener('submit', (e) => {
       e.preventDefault();
