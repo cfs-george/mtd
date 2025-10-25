@@ -40,6 +40,10 @@
     .dark-mode-toggle { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; }
     /* VAT checkbox alignment */
     label.checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .checkbox-label input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
     /* Mobile styles */
     @media (max-width: 600px) {
       body { margin: 20px; }
@@ -99,7 +103,7 @@
     <form id="incomeForm">
       <input type="date" id="incomeDate" required />
       <input type="number" id="incomeAmount" placeholder="Gross Amount (£)" required />
-      <label class="checkbox-label"><input type="checkbox" id="incomeVAT" /> Includes VAT</label>
+      <label class="checkbox-label">Includes VAT?<input type="checkbox" id="incomeVAT" /></label>
       <select id="incomeCategory">
         <option>Consulting</option>
         <option>Sales</option>
