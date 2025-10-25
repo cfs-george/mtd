@@ -8,12 +8,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
-
     * {
       font-family: "Inter", sans-serif;
       box-sizing: border-box;
     }
-
     body {
       margin: 40px auto;
       max-width: 800px;
@@ -21,19 +19,16 @@
       color: #222;
       transition: background-color 0.3s, color 0.3s;
     }
-
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
-
     .dark-mode {
       background-color: #121212;
       color: #f0f0f0;
     }
-
     button {
       background: #6CA5AC;
       border: none;
@@ -44,11 +39,9 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     button:hover {
       background: #91e5f0;
     }
-
     .section {
       margin-top: 20px;
       background: white;
@@ -57,11 +50,9 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       transition: background-color 0.3s;
     }
-
     .dark-mode .section {
       background: #1e1e1e;
     }
-
     input,
     select {
       padding: 6px;
@@ -72,44 +63,37 @@
       background: #fff;
       color: #000;
     }
-
     .dark-mode input,
     .dark-mode select {
       background: #2a2a2a;
       color: #fff;
       border-color: #444;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-
     th,
     td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: left;
     }
-
     .dark-mode th,
     .dark-mode td {
       border-color: #444;
     }
-
     .summary {
       font-weight: bold;
       margin-top: 10px;
     }
-
     .tabs {
       display: flex;
       border-bottom: 2px solid #ccc;
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
-
     .tab {
       padding: 10px 20px;
       cursor: pointer;
@@ -119,37 +103,30 @@
       margin-right: 5px;
       transition: background 0.2s;
     }
-
     .tab:hover {
       background: #d7dde3;
     }
-
     .tab.active {
       background: white;
       border-bottom: 2px solid white;
       font-weight: bold;
     }
-
     .dark-mode .tab {
       background: #2a2a2a;
       color: #ddd;
       border-color: #444;
     }
-
     .dark-mode .tab.active {
       background: #1e1e1e;
       border-bottom: 2px solid #1e1e1e;
       color: #fff;
     }
-
     .tab-content {
       display: none;
     }
-
     .tab-content.active {
       display: block;
     }
-
     .dark-mode-toggle {
       background: none;
       border: none;
@@ -157,41 +134,34 @@
       cursor: pointer;
       color: inherit;
     }
-
     /* VAT & EU checkbox alignment */
     label.checkbox-label {
       display: flex;
       align-items: center;
       gap: 6px;
     }
-
     .checkbox-label input[type="checkbox"] {
       width: 20px;
       height: 20px;
       cursor: pointer;
       margin-left: 10px;
     }
-
     /* Mobile styles */
     @media (max-width: 770px) {
       body {
         margin: 20px;
       }
-
       .tabs {
         flex-direction: column;
       }
-
       .tab {
         margin-bottom: 5px;
       }
-
       input,
       select,
       button {
         font-size: 0.9rem;
       }
-
       th,
       td {
         font-size: 0.85rem;
@@ -204,14 +174,12 @@
     <h1>MTD Prototype</h1>
     <button id="darkModeToggle" class="dark-mode-toggle"><i class="fas fa-moon"></i></button>
   </header>
-
   <div class="tabs">
     <div class="tab active" onclick="showTab('profile')">Business Profile</div>
     <div class="tab" onclick="showTab('income')">Income</div>
     <div class="tab" onclick="showTab('expenses')">Expenses</div>
     <div class="tab" onclick="showTab('summary')">Summary</div>
   </div>
-
   <!-- Profile -->
   <section id="profile" class="section tab-content active">
     <h2>Business Profile</h2>
@@ -243,7 +211,6 @@
       <button type="submit">Update Profile</button>
     </form>
   </section>
-
   <!-- Income -->
   <section id="income" class="section tab-content">
     <h2>Record Income</h2>
@@ -262,11 +229,8 @@
       <label class="checkbox-label">Sold to EU or NI?<input type="checkbox" id="incomeEU" /></label>
       <button type="submit">Add Income</button>
     </form>
-    <table id="incomeTable">
-      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th><th>EU?</th></tr>
-    </table>
+    <div id="incomeTableWrapper"></div>
   </section>
-
   <!-- Expenses -->
   <section id="expenses" class="section tab-content">
     <h2>Record Expense</h2>
@@ -287,11 +251,8 @@
       <label class="checkbox-label">Purchased from EU or NI?<input type="checkbox" id="expenseEU" /></label>
       <button type="submit">Add Expense</button>
     </form>
-    <table id="expenseTable">
-      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th><th>EU?</th></tr>
-    </table>
+    <div id="expenseTableWrapper"></div>
   </section>
-
   <!-- Summary -->
   <section id="summary" class="section tab-content">
     <h2>Summary</h2>
@@ -309,19 +270,17 @@
       Net Total: £<span id="netTotal">0</span>
     </div>
   </section>
-
   <script>
     const incomeForm = document.getElementById('incomeForm');
     const expenseForm = document.getElementById('expenseForm');
-    const incomeTable = document.getElementById('incomeTable');
-    const expenseTable = document.getElementById('expenseTable');
+    const incomeTableWrapper = document.getElementById('incomeTableWrapper');
+    const expenseTableWrapper = document.getElementById('expenseTableWrapper');
     const totalIncomeEl = document.getElementById('totalIncome');
     const totalExpensesEl = document.getElementById('totalExpenses');
     const netTotalEl = document.getElementById('netTotal');
     const darkModeToggle = document.getElementById('darkModeToggle');
     const profileForm = document.getElementById('profileForm');
     const quarterSelect = document.getElementById('quarterSelect');
-
     let records = { income: [], expenses: [] };
     let vatRate = 20;
 
@@ -336,10 +295,8 @@
       const rate = vatRate / 100;
       const vat = hasVAT ? (gross - gross / (1 + rate)) : 0;
       const net = gross - vat;
-
       const record = { date, gross, net, vat, category, desc, eu: isEU };
       records[type].push(record);
-
       // Logging
       console.log(`[ADD RECORD] Type: ${type}`);
       console.log(`Date: ${date}`);
@@ -355,19 +312,38 @@
     }
 
     function renderTable(type) {
-      const table = type === 'income' ? incomeTable : expenseTable;
-      const rows = table.querySelectorAll('tr:not(:first-child)');
-      rows.forEach(r => r.remove());
+      const wrapper = type === 'income' ? incomeTableWrapper : expenseTableWrapper;
+      wrapper.innerHTML = ''; // Clear existing content
+
+      if (records[type].length === 0) {
+        return; // No table or headers if no records
+      }
+
+      const table = document.createElement('table');
+      table.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Net (£)</th>
+          <th>VAT (£)</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>EU?</th>
+        </tr>
+      `;
 
       records[type].forEach(r => {
         const row = table.insertRow();
-        row.innerHTML = `<td>${r.date}</td>
-                         <td>£${r.net.toFixed(2)}</td>
-                         <td>£${r.vat.toFixed(2)}</td>
-                         <td>${r.category}</td>
-                         <td>${r.desc}</td>
-                         <td>${r.eu ? '✔' : ''}</td>`;
+        row.innerHTML = `
+          <td>${r.date}</td>
+          <td>£${r.net.toFixed(2)}</td>
+          <td>£${r.vat.toFixed(2)}</td>
+          <td>${r.category}</td>
+          <td>${r.desc}</td>
+          <td>${r.eu ? '✔' : ''}</td>
+        `;
       });
+
+      wrapper.appendChild(table);
     }
 
     function updateSummary() {
@@ -397,8 +373,8 @@
         incomeDescription.value,
         incomeEU.checked
       );
-      renderTable('income'); 
-      updateSummary(); 
+      renderTable('income');
+      updateSummary();
       incomeForm.reset();
     });
 
@@ -413,8 +389,8 @@
         expenseDescription.value,
         expenseEU.checked
       );
-      renderTable('expenses'); 
-      updateSummary(); 
+      renderTable('expenses');
+      updateSummary();
       expenseForm.reset();
     });
 
@@ -438,6 +414,10 @@
       icon.classList.toggle('fa-sun');
       icon.classList.toggle('fa-moon');
     });
+
+    // Initial render (empty tables)
+    renderTable('income');
+    renderTable('expenses');
   </script>
 </body>
 </html>
