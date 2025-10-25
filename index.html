@@ -9,7 +9,11 @@
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
-    * { font-family: "Inter", sans-serif; box-sizing: border-box; }
+    * {
+      font-family: "Inter", sans-serif;
+      box-sizing: border-box;
+    }
+
     body {
       margin: 40px auto;
       max-width: 800px;
@@ -17,42 +21,180 @@
       color: #222;
       transition: background-color 0.3s, color 0.3s;
     }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .dark-mode { background-color: #121212; color: #f0f0f0; }
-    button { background: #6CA5AC; border: none; color: white; padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: background 0.3s; }
-    button:hover { background: #91e5f0; }
-    .section { margin-top: 20px; background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: background-color 0.3s; }
-    .dark-mode .section { background: #1e1e1e; }
-    input, select { padding: 6px; margin: 6px 0; border: 1px solid #ccc; border-radius: 4px; width: 100%; background: #fff; color: #000; }
-    .dark-mode input, .dark-mode select { background: #2a2a2a; color: #fff; border-color: #444; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    .dark-mode th, .dark-mode td { border-color: #444; }
-    .summary { font-weight: bold; margin-top: 10px; }
-    .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab { padding: 10px 20px; cursor: pointer; border-top-left-radius: 10px; border-top-right-radius: 10px; background: #e9ecef; margin-right: 5px; transition: background 0.2s; }
-    .tab:hover { background: #d7dde3; }
-    .tab.active { background: white; border-bottom: 2px solid white; font-weight: bold; }
-    .dark-mode .tab { background: #2a2a2a; color: #ddd; border-color: #444; }
-    .dark-mode .tab.active { background: #1e1e1e; border-bottom: 2px solid #1e1e1e; color: #fff; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .dark-mode-toggle { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+
+    button {
+      background: #6CA5AC;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #91e5f0;
+    }
+
+    .section {
+      margin-top: 20px;
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: background-color 0.3s;
+    }
+
+    .dark-mode .section {
+      background: #1e1e1e;
+    }
+
+    input,
+    select {
+      padding: 6px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      background: #fff;
+      color: #000;
+    }
+
+    .dark-mode input,
+    .dark-mode select {
+      background: #2a2a2a;
+      color: #fff;
+      border-color: #444;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .dark-mode th,
+    .dark-mode td {
+      border-color: #444;
+    }
+
+    .summary {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      background: #e9ecef;
+      margin-right: 5px;
+      transition: background 0.2s;
+    }
+
+    .tab:hover {
+      background: #d7dde3;
+    }
+
+    .tab.active {
+      background: white;
+      border-bottom: 2px solid white;
+      font-weight: bold;
+    }
+
+    .dark-mode .tab {
+      background: #2a2a2a;
+      color: #ddd;
+      border-color: #444;
+    }
+
+    .dark-mode .tab.active {
+      background: #1e1e1e;
+      border-bottom: 2px solid #1e1e1e;
+      color: #fff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .dark-mode-toggle {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: inherit;
+    }
+
     /* VAT checkbox alignment */
-    label.checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    label.checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .checkbox-label input[type="checkbox"] {
       width: 20px;
       height: 20px;
       cursor: pointer;
       margin-left: 20px;
     }
+
     /* Mobile styles */
     @media (max-width: 600px) {
-      body { margin: 20px; }
-      .tabs { flex-direction: column; }
-      .tab { margin-bottom: 5px; }
-      input, select, button { font-size: 0.9rem; }
-      th, td { font-size: 0.85rem; }
+      body {
+        margin: 20px;
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
+
+      .tab {
+        margin-bottom: 5px;
+      }
+
+      input,
+      select,
+      button {
+        font-size: 0.9rem;
+      }
+
+      th,
+      td {
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
@@ -187,8 +329,24 @@
       const rate = vatRate / 100;
       const vat = hasVAT ? (gross - gross / (1 + rate)) : 0;
       const net = gross - vat;
-      records[type].push({ date, gross, net, vat, category, desc });
+
+      // Push the record
+      const record = { date, gross, net, vat, category, desc };
+      records[type].push(record);
+
+      // Logging
+      console.log(`[ADD RECORD] Type: ${type}`);
+      console.log(`Date: ${date}`);
+      console.log(`Gross: £${gross.toFixed(2)}`);
+      console.log(`VAT applicable: ${hasVAT}`);
+      console.log(`VAT rate: ${vatRate}%`);
+      console.log(`VAT amount: £${vat.toFixed(2)}`);
+      console.log(`Net amount: £${net.toFixed(2)}`);
+      console.log(`Category: ${category}`);
+      console.log(`Description: ${desc}`);
+      console.log(`Current ${type} records:`, records[type]);
     }
+
 
     function renderTable(type) {
       const table = type === 'income' ? incomeTable : expenseTable;
