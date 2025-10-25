@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini MTD Prototype</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+      h1 { text-align: center; }
+      .tabs { display: flex; margin-bottom: 20px; cursor: pointer; }
+      .tab { padding: 10px 20px; background: #ddd; margin-right: 5px; border-radius: 5px 5px 0 0; }
+      .tab.active { background: #4CAF50; color: white; }
+      .tab-content { background: white; padding: 20px; border-radius: 0 5px 5px 5px; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+      th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ccc; }
+      input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 5px; box-sizing: border-box; }
+      button { padding: 8px 12px; margin-top: 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; }
+      button:hover { background: #45a049; }
+      .summary { font-weight: bold; font-size: 1.2em; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <h1>MTD Prototype</h1>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('income')">Income</div>
+      <div class="tab" onclick="showTab('expenses')">Expenses</div>
+      <div class="tab" onclick="showTab('summary')">Summary</div>
+    </div>
+
+    <div id="income" class="tab-content">
+      <table id="income-table">
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Amount (£)</th>
+        </tr>
+      </table>
+      <input type="date" id="income-date">
+      <input type="text" id="income-desc" placeholder="Description">
+      <select id="income-cat">
+        <option value="Consulting">Consulting</option>
+        <option value="Sales">Sales</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="number" id="income-amount" placeholder="Amount">
+      <button onclick="addIncome()">Add Income</button>
+    </div>
+
+    <div id="expenses" class="tab-content" style="display:none;">
+      <table id="expense-table">
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Amount (£)</th>
+        </tr>
+      </table>
+      <input type="date" id="expense-date">
+      <input type="text" id="expense-desc" placeholder="Description">
+      <select id="expense-cat">
+        <option value="Travel">Travel</option>
+        <option value="Equipment">Equipment</option>
+        <option value="Office">Office</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="number" id="expense-amount" placeholder="Amount">
+      <button onclick="addExpense()">Add Expense</button>
+    </div>
+
+    <div id="summary" class="tab-content" style="display:none;">
+      <div class="summary">
+        Total Income: £<span id="total-income">0.00</span><br>
+        Total Expenses: £<span id="total-expenses">0.00</span><br>
+        Net Profit: £<span id="net-profit">0.00</span>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tc => tc.style.display = 'none');
+        document.getElementById(tabName).style.display = 'block';
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('.tab[onclick*="' + tabName + '"]').classList.add('active');
+      }
+
+      let incomes = [];
+      let expenses = [];
+
+      function addIncome() {
+        const date = document.getElementById('income-date').value;
+        const desc = document.getElementById('income-desc').value;
+        const cat = document.getElementById('income-cat').value;
+        const amount = parseFloat(document.getElementById('income-amount').value) || 0;
+        if (!date || !desc || !amount) return alert('Fill all fields');
+
+        incomes.push({ date, desc, cat, amount });
+        const table = document.getElementById('income-table');
+        const row = table.insertRow();
+        row.insertCell(0).innerText = date;
+        row.insertCell(1).innerText = desc;
+        row.insertCell(2).innerText = cat;
+        row.insertCell(3).innerText = amount.toFixed(2);
+        updateSummary();
+      }
+
+      function addExpense() {
+        const date = document.getElementById('expense-date').value;
+        const desc = document.getElementById('expense-desc').value;
+        const cat = document.getElementById('expense-cat').value;
+        const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+        if (!date || !desc || !amount) return alert('Fill all fields');
+
+        expenses.push({ date, desc, cat, amount });
+        const table = document.getElementById('expense-table');
+        const row = table.insertRow();
+        row.insertCell(0).innerText = date;
+        row.insertCell(1).innerText = desc;
+        row.insertCell(2).innerText = cat;
+        row.insertCell(3).innerText = amount.toFixed(2);
+        updateSummary();
+      }
+
+      function updateSummary() {
+        const totalIncome = incomes.reduce((a, b) => a + b.amount, 0);
+        const totalExpenses = expenses.reduce((a, b) => a + b.amount, 0);
+        document.getElementById('total-income').innerText = totalIncome.toFixed(2);
+        document.getElementById('total-expenses').innerText = totalExpenses.toFixed(2);
+        document.getElementById('net-profit').innerText = (totalIncome - totalExpenses).toFixed(2);
+      }
+    </script>
+  </body>
+</html>
