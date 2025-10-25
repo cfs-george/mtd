@@ -9,10 +9,7 @@
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
-    * {
-      font-family: "Inter", sans-serif;
-      box-sizing: border-box;
-    }
+    * { font-family: "Inter", sans-serif; box-sizing: border-box; }
 
     body {
       margin: 40px auto;
@@ -29,10 +26,7 @@
       margin-bottom: 20px;
     }
 
-    .dark-mode {
-      background-color: #121212;
-      color: #f0f0f0;
-    }
+    .dark-mode { background-color: #121212; color: #f0f0f0; }
 
     button {
       background: #6CA5AC;
@@ -43,10 +37,7 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
-    button:hover {
-      background: #91e5f0;
-    }
+    button:hover { background: #91e5f0; }
 
     .section {
       margin-top: 20px;
@@ -56,13 +47,9 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       transition: background-color 0.3s;
     }
+    .dark-mode .section { background: #1e1e1e; }
 
-    .dark-mode .section {
-      background: #1e1e1e;
-    }
-
-    input,
-    select {
+    input, select {
       padding: 6px;
       margin: 6px 0;
       border: 1px solid #ccc;
@@ -71,44 +58,15 @@
       background: #fff;
       color: #000;
     }
+    .dark-mode input, .dark-mode select { background: #2a2a2a; color: #fff; border-color: #444; }
 
-    .dark-mode input,
-    .dark-mode select {
-      background: #2a2a2a;
-      color: #fff;
-      border-color: #444;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .dark-mode th, .dark-mode td { border-color: #444; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
+    .summary { font-weight: bold; margin-top: 10px; }
 
-    th,
-    td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-
-    .dark-mode th,
-    .dark-mode td {
-      border-color: #444;
-    }
-
-    .summary {
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .tabs {
-      display: flex;
-      border-bottom: 2px solid #ccc;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
+    .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 20px; flex-wrap: wrap; }
     .tab {
       padding: 10px 20px;
       cursor: pointer;
@@ -118,83 +76,27 @@
       margin-right: 5px;
       transition: background 0.2s;
     }
+    .tab:hover { background: #d7dde3; }
+    .tab.active { background: white; border-bottom: 2px solid white; font-weight: bold; }
+    .dark-mode .tab { background: #2a2a2a; color: #ddd; border-color: #444; }
+    .dark-mode .tab.active { background: #1e1e1e; border-bottom: 2px solid #1e1e1e; color: #fff; }
 
-    .tab:hover {
-      background: #d7dde3;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-    .tab.active {
-      background: white;
-      border-bottom: 2px solid white;
-      font-weight: bold;
-    }
+    .dark-mode-toggle { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: inherit; }
 
-    .dark-mode .tab {
-      background: #2a2a2a;
-      color: #ddd;
-      border-color: #444;
-    }
-
-    .dark-mode .tab.active {
-      background: #1e1e1e;
-      border-bottom: 2px solid #1e1e1e;
-      color: #fff;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .dark-mode-toggle {
-      background: none;
-      border: none;
-      font-size: 1.4rem;
-      cursor: pointer;
-      color: inherit;
-    }
-
-    /* VAT checkbox alignment */
-    label.checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .checkbox-label input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      margin-left: 20px;
-    }
+    /* VAT & EU checkbox alignment */
+    label.checkbox-label { display: flex; align-items: center; gap: 6px; }
+    .checkbox-label input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; margin-left: 10px; }
 
     /* Mobile styles */
     @media (max-width: 770px) {
-      body {
-        margin: 20px;
-      }
-
-      .tabs {
-        flex-direction: column;
-      }
-
-      .tab {
-        margin-bottom: 5px;
-      }
-
-      input,
-      select,
-      button {
-        font-size: 0.9rem;
-      }
-
-      th,
-      td {
-        font-size: 0.85rem;
-      }
+      body { margin: 20px; }
+      .tabs { flex-direction: column; }
+      .tab { margin-bottom: 5px; }
+      input, select, button { font-size: 0.9rem; }
+      th, td { font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -211,6 +113,7 @@
     <div class="tab" onclick="showTab('summary')">Summary</div>
   </div>
 
+  <!-- Profile -->
   <section id="profile" class="section tab-content active">
     <h2>Business Profile</h2>
     <div id="profileDisplay">
@@ -242,6 +145,7 @@
     </form>
   </section>
 
+  <!-- Income -->
   <section id="income" class="section tab-content">
     <h2>Record Income</h2>
     <form id="incomeForm">
@@ -256,14 +160,15 @@
       </select>
       <input type="text" id="incomeDescription" placeholder="Description" />
       <label class="checkbox-label">Includes VAT?<input type="checkbox" id="incomeVAT" /></label>
-      <label class="checkbox-label">Was this sold to the EU or Northern Ireland?<input type="checkbox" id="incomeEU" /></label>
+      <label class="checkbox-label">Sold to EU or NI?<input type="checkbox" id="incomeEU" /></label>
       <button type="submit">Add Income</button>
     </form>
     <table id="incomeTable">
-      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th></tr>
+      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th><th>EU?</th></tr>
     </table>
   </section>
 
+  <!-- Expenses -->
   <section id="expenses" class="section tab-content">
     <h2>Record Expense</h2>
     <form id="expenseForm">
@@ -280,22 +185,23 @@
       </select>
       <input type="text" id="expenseDescription" placeholder="Description" />
       <label class="checkbox-label">Includes VAT?<input type="checkbox" id="expenseVAT" /></label>
-      <label class="checkbox-label">Was this purchased from the EU or Northern Ireland?<input type="checkbox" id="expenseEU" /></label>
+      <label class="checkbox-label">Purchased from EU or NI?<input type="checkbox" id="expenseEU" /></label>
       <button type="submit">Add Expense</button>
     </form>
     <table id="expenseTable">
-      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th></tr>
+      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th><th>EU?</th></tr>
     </table>
   </section>
 
+  <!-- Summary -->
   <section id="summary" class="section tab-content">
     <h2>Summary</h2>
     <label>Select Quarter:
       <select id="quarterSelect">
         <option value="1">Q1 (6 Apr – 5 Jul)</option>
-        <option value="2">Q2 (6 Apr – 5 Oct)</option>
-        <option value="3">Q3 (6 Apr – 5 Jan)</option>
-        <option value="4">Q4 (6 Apr – 5 Apr)</option>
+        <option value="2">Q2 (6 Jul – 5 Oct)</option>
+        <option value="3">Q3 (6 Oct – 5 Jan)</option>
+        <option value="4">Q4 (6 Jan – 5 Apr)</option>
       </select>
     </label>
     <div class="summary">
@@ -332,7 +238,6 @@
       const vat = hasVAT ? (gross - gross / (1 + rate)) : 0;
       const net = gross - vat;
 
-      // Push the record with EU info
       const record = { date, gross, net, vat, category, desc, eu: isEU };
       records[type].push(record);
 
@@ -350,34 +255,39 @@
       console.log(`Current ${type} records:`, records[type]);
     }
 
-    // Adjust table rendering to include EU column
     function renderTable(type) {
       const table = type === 'income' ? incomeTable : expenseTable;
       const rows = table.querySelectorAll('tr:not(:first-child)');
       rows.forEach(r => r.remove());
 
-      // Insert EU header if not already present
-      if (!table.querySelector('th.eu-col')) {
-        const headerRow = table.rows[0];
-        const euHeader = document.createElement('th');
-        euHeader.textContent = 'EU?';
-        euHeader.classList.add('eu-col');
-        headerRow.appendChild(euHeader);
-      }
-
       records[type].forEach(r => {
         const row = table.insertRow();
         row.innerHTML = `<td>${r.date}</td>
-                        <td>£${r.net.toFixed(2)}</td>
-                        <td>£${r.vat.toFixed(2)}</td>
-                        <td>${r.category}</td>
-                        <td>${r.desc}</td>
-                        <td>${r.eu ? '✔' : ''}</td>`;
+                         <td>£${r.net.toFixed(2)}</td>
+                         <td>£${r.vat.toFixed(2)}</td>
+                         <td>${r.category}</td>
+                         <td>${r.desc}</td>
+                         <td>${r.eu ? '✔' : ''}</td>`;
       });
     }
 
-    // Update form submission to pass EU checkbox value
-    incomeForm.addEventListener('submit', e => {
+    function updateSummary() {
+      const startYear = 2025;
+      const cutoffDates = [
+        new Date(`${startYear}-07-06`),
+        new Date(`${startYear}-10-06`),
+        new Date(`${startYear+1}-01-06`),
+        new Date(`${startYear+1}-04-06`)
+      ];
+      const upTo = cutoffDates[parseInt(quarterSelect.value)-1];
+      const totalIncome = records.income.filter(r => new Date(r.date) < upTo).reduce((sum,r)=>sum+r.net,0);
+      const totalExpenses = records.expenses.filter(r => new Date(r.date) < upTo).reduce((sum,r)=>sum+r.net,0);
+      totalIncomeEl.textContent = totalIncome.toFixed(2);
+      totalExpensesEl.textContent = totalExpenses.toFixed(2);
+      netTotalEl.textContent = (totalIncome - totalExpenses).toFixed(2);
+    }
+
+    incomeForm.addEventListener('submit', e=>{
       e.preventDefault();
       addRecord(
         'income',
@@ -393,7 +303,7 @@
       incomeForm.reset();
     });
 
-    expenseForm.addEventListener('submit', e => {
+    expenseForm.addEventListener('submit', e=>{
       e.preventDefault();
       addRecord(
         'expenses',
