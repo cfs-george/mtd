@@ -1,248 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini MTD Prototype</title>
-    <style>
-      body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-      h1 { text-align: center; }
-      .tabs { display: flex; margin-bottom: 20px; cursor: pointer; }
-      .tab { padding: 10px 20px; background: #ddd; margin-right: 5px; border-radius: 5px 5px 0 0; }
-      .tab.active { background: #6CA5AC; color: white; }
-      .tab-content { background: white; padding: 20px; border-radius: 0 5px 5px 5px; }
-      table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-      th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ccc; }
-      input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 5px; box-sizing: border-box; }
-      button { padding: 8px 12px; margin-top: 10px; background: #6CA5AC; color: white; border: none; border-radius: 3px; cursor: pointer; }
-      button:hover { background: #91e5f0; }
-      .summary { font-weight: bold; font-size: 1.2em; margin-top: 10px; }
-      .profile-field { margin-bottom: 10px; }
-    </style>
-  </head>
-  <body>
-    <h1>MTD Prototype (2026)</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MTD Prototype</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px auto;
+      max-width: 800px;
+      background-color: #f5f7fa;
+      color: #222;
+      transition: background-color 0.3s, color 0.3s;
+    }
 
-    <div class="tabs">
-      <div class="tab active" onclick="showTab('profile')">Business Profile</div>
-      <div class="tab" onclick="showTab('income')">Income</div>
-      <div class="tab" onclick="showTab('expenses')">Expenses</div>
-      <div class="tab" onclick="showTab('summary')">Summary</div>
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+
+    button {
+      background: #0078d4;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #005a9e;
+    }
+
+    h2 {
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 6px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: background-color 0.3s;
+    }
+
+    .dark-mode .section {
+      background: #1e1e1e;
+    }
+
+    input, select {
+      padding: 6px;
+      margin: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: calc(100% - 20px);
+      box-sizing: border-box;
+      background: #fff;
+      color: #000;
+    }
+
+    .dark-mode input, 
+    .dark-mode select {
+      background: #2a2a2a;
+      color: #fff;
+      border-color: #444;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .dark-mode th, .dark-mode td {
+      border-color: #444;
+    }
+
+    .summary {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MTD Simple Prototype</h1>
+    <button id="darkModeToggle">🌙 Dark Mode</button>
+  </header>
+
+  <section class="section">
+    <h2>Business Profile</h2>
+    <div id="profileDisplay">
+      <p><strong>Business Name:</strong> <span id="displayName">Not set</span></p>
+      <p><strong>VAT Number:</strong> <span id="displayVAT">Not set</span></p>
+      <p><strong>Accounting Period:</strong> <span id="displayPeriod">Not set</span></p>
     </div>
+    <form id="profileForm">
+      <input type="text" id="businessName" placeholder="Business Name" required />
+      <input type="text" id="vatNumber" placeholder="VAT Number" />
+      <input type="text" id="accountingPeriod" placeholder="Accounting Period (e.g. 2024–2025)" />
+      <button type="submit">Update Profile</button>
+    </form>
+  </section>
 
-    <!-- Business Profile -->
-    <div id="profile" class="tab-content">
-      <div class="profile-field">
-        <label>Business Name:</label>
-        <input type="text" id="business-name" placeholder="My Business Ltd">
-      </div>
-      <div class="profile-field">
-        <label>Business Type:</label>
-        <select id="business-type">
-          <option value="Sole Trader">Sole Trader</option>
-          <option value="Landlord">Landlord</option>
-        </select>
-      </div>
-      <div class="profile-field">
-        <label>Accounting Basis:</label>
-        <select id="accounting-basis">
-          <option value="Cash">Cash</option>
-          <option value="Accrual">Accrual</option>
-        </select>
-      </div>
-      <div class="profile-field">
-        <label>Accounting Period Start:</label>
-        <input type="date" id="period-start" value="2026-04-06">
-      </div>
-      <button onclick="saveProfile()">Save Profile</button>
-    </div>
-
-    <!-- Income -->
-    <div id="income" class="tab-content" style="display:none;">
-      <table id="income-table">
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Category</th>
-          <th>Amount (£)</th>
-          <th>VAT?</th>
-        </tr>
-      </table>
-      <input type="date" id="income-date">
-      <input type="text" id="income-desc" placeholder="Description">
-      <select id="income-cat">
-        <option value="Consulting">Consulting</option>
-        <option value="Sales">Sales</option>
-        <option value="Other">Other</option>
+  <section class="section">
+    <h2>Record Income</h2>
+    <form id="incomeForm">
+      <input type="date" id="incomeDate" required />
+      <input type="number" id="incomeAmount" placeholder="Amount (£)" required />
+      <select id="incomeCategory">
+        <option>Client Payment</option>
+        <option>Grant or Funding</option>
+        <option>Asset Sale</option>
+        <option>Interest Income</option>
       </select>
-      <input type="number" id="income-amount" placeholder="Amount">
-      <label><input type="checkbox" id="income-vat"> VAT Applied</label>
-      <button onclick="addIncome()">Add Income</button>
-    </div>
+      <input type="text" id="incomeDescription" placeholder="Description" />
+      <button type="submit">Add Income</button>
+    </form>
+    <table id="incomeTable">
+      <tr><th>Date</th><th>Amount</th><th>Category</th><th>Description</th></tr>
+    </table>
+  </section>
 
-    <!-- Expenses -->
-    <div id="expenses" class="tab-content" style="display:none;">
-      <table id="expense-table">
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Category</th>
-          <th>Amount (£)</th>
-          <th>VAT?</th>
-        </tr>
-      </table>
-      <input type="date" id="expense-date">
-      <input type="text" id="expense-desc" placeholder="Description">
-      <select id="expense-cat">
-        <option value="Travel">Travel</option>
-        <option value="Equipment">Equipment</option>
-        <option value="Office">Office</option>
-        <option value="Other">Other</option>
+  <section class="section">
+    <h2>Record Expense</h2>
+    <form id="expenseForm">
+      <input type="date" id="expenseDate" required />
+      <input type="number" id="expenseAmount" placeholder="Amount (£)" required />
+      <select id="expenseCategory">
+        <option>Office Supplies</option>
+        <option>Travel</option>
+        <option>Equipment</option>
+        <option>Utilities</option>
+        <option>Other</option>
       </select>
-      <input type="number" id="expense-amount" placeholder="Amount">
-      <label><input type="checkbox" id="expense-vat"> VAT Applied</label>
-      <button onclick="addExpense()">Add Expense</button>
+      <input type="text" id="expenseDescription" placeholder="Description" />
+      <button type="submit">Add Expense</button>
+    </form>
+    <table id="expenseTable">
+      <tr><th>Date</th><th>Amount</th><th>Category</th><th>Description</th></tr>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2>Summary</h2>
+    <div class="summary">
+      Total Income: £<span id="totalIncome">0</span><br>
+      Total Expenses: £<span id="totalExpenses">0</span><br>
+      Net Total: £<span id="netTotal">0</span>
     </div>
+  </section>
 
-    <!-- Summary -->
-    <div id="summary" class="tab-content" style="display:none;">
-      <label>Select Quarter:</label>
-      <select id="quarter-select" onchange="updateSummary()">
-        <option value="all">Full Year</option>
-        <option value="Q1">Q1 (6 Apr – 5 Jul)</option>
-        <option value="Q2">Q2 (6 Jul – 5 Oct)</option>
-        <option value="Q3">Q3 (6 Oct – 5 Jan)</option>
-        <option value="Q4">Q4 (6 Jan – 5 Apr)</option>
-      </select>
+  <script>
+    const incomeForm = document.getElementById('incomeForm');
+    const expenseForm = document.getElementById('expenseForm');
+    const incomeTable = document.getElementById('incomeTable');
+    const expenseTable = document.getElementById('expenseTable');
+    const totalIncomeEl = document.getElementById('totalIncome');
+    const totalExpensesEl = document.getElementById('totalExpenses');
+    const netTotalEl = document.getElementById('netTotal');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const profileForm = document.getElementById('profileForm');
 
-      <div class="summary">
-        Total Income: £<span id="total-income">0.00</span><br>
-        Total Expenses: £<span id="total-expenses">0.00</span><br>
-        Net Profit: £<span id="net-profit">0.00</span>
-      </div>
+    let totalIncome = 0;
+    let totalExpenses = 0;
 
-      <button onclick="generateQuarterlyUpdate()">Generate Quarterly Update</button>
-    </div>
+    incomeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const date = incomeDate.value;
+      const amount = parseFloat(incomeAmount.value);
+      const category = incomeCategory.value;
+      const desc = incomeDescription.value;
+      const row = incomeTable.insertRow();
+      row.innerHTML = `<td>${date}</td><td>£${amount.toFixed(2)}</td><td>${category}</td><td>${desc}</td>`;
+      totalIncome += amount;
+      updateSummary();
+      incomeForm.reset();
+    });
 
-    <script>
-      // ---- Tab handling ----
-      function showTab(tabName) {
-        document.querySelectorAll('.tab-content').forEach(tc => tc.style.display = 'none');
-        document.getElementById(tabName).style.display = 'block';
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('.tab[onclick*="' + tabName + '"]').classList.add('active');
-      }
+    expenseForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const date = expenseDate.value;
+      const amount = parseFloat(expenseAmount.value);
+      const category = expenseCategory.value;
+      const desc = expenseDescription.value;
+      const row = expenseTable.insertRow();
+      row.innerHTML = `<td>${date}</td><td>£${amount.toFixed(2)}</td><td>${category}</td><td>${desc}</td>`;
+      totalExpenses += amount;
+      updateSummary();
+      expenseForm.reset();
+    });
 
-      // ---- Data stores ----
-      let incomes = JSON.parse(localStorage.getItem('incomes') || '[]');
-      let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      let businessProfile = JSON.parse(localStorage.getItem('businessProfile') || '{}');
+    profileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      document.getElementById('displayName').textContent = businessName.value || 'Not set';
+      document.getElementById('displayVAT').textContent = vatNumber.value || 'Not set';
+      document.getElementById('displayPeriod').textContent = accountingPeriod.value || 'Not set';
+      profileForm.reset();
+    });
 
-      // ---- Business profile ----
-      function saveProfile() {
-        businessProfile = {
-          name: document.getElementById('business-name').value,
-          type: document.getElementById('business-type').value,
-          basis: document.getElementById('accounting-basis').value,
-          periodStart: document.getElementById('period-start').value
-        };
-        localStorage.setItem('businessProfile', JSON.stringify(businessProfile));
-        alert('Profile saved');
-      }
+    function updateSummary() {
+      totalIncomeEl.textContent = totalIncome.toFixed(2);
+      totalExpensesEl.textContent = totalExpenses.toFixed(2);
+      netTotalEl.textContent = (totalIncome - totalExpenses).toFixed(2);
+    }
 
-      // ---- Add income / expense ----
-      function addIncome() {
-        const date = document.getElementById('income-date').value;
-        const desc = document.getElementById('income-desc').value;
-        const cat = document.getElementById('income-cat').value;
-        const amount = parseFloat(document.getElementById('income-amount').value) || 0;
-        const vat = document.getElementById('income-vat').checked;
-        if (!date || !desc || !amount) return alert('Fill all fields');
-
-        const record = { date, desc, cat, amount, vat };
-        incomes.push(record);
-        localStorage.setItem('incomes', JSON.stringify(incomes));
-        addRow('income-table', record);
-        updateSummary();
-      }
-
-      function addExpense() {
-        const date = document.getElementById('expense-date').value;
-        const desc = document.getElementById('expense-desc').value;
-        const cat = document.getElementById('expense-cat').value;
-        const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
-        const vat = document.getElementById('expense-vat').checked;
-        if (!date || !desc || !amount) return alert('Fill all fields');
-
-        const record = { date, desc, cat, amount, vat };
-        expenses.push(record);
-        localStorage.setItem('expenses', JSON.stringify(expenses));
-        addRow('expense-table', record);
-        updateSummary();
-      }
-
-      // ---- Add row to table ----
-      function addRow(tableId, record) {
-        const table = document.getElementById(tableId);
-        const row = table.insertRow();
-        row.insertCell(0).innerText = record.date;
-        row.insertCell(1).innerText = record.desc;
-        row.insertCell(2).innerText = record.cat;
-        row.insertCell(3).innerText = record.amount.toFixed(2);
-        row.insertCell(4).innerText = record.vat ? 'Yes' : 'No';
-      }
-
-      // ---- Calculate and update summary ----
-      function updateSummary() {
-        const quarter = document.getElementById('quarter-select').value;
-        const filteredIncome = filterByQuarter(incomes, quarter);
-        const filteredExpenses = filterByQuarter(expenses, quarter);
-        const totalIncome = filteredIncome.reduce((a, b) => a + b.amount, 0);
-        const totalExpenses = filteredExpenses.reduce((a, b) => a + b.amount, 0);
-        document.getElementById('total-income').innerText = totalIncome.toFixed(2);
-        document.getElementById('total-expenses').innerText = totalExpenses.toFixed(2);
-        document.getElementById('net-profit').innerText = (totalIncome - totalExpenses).toFixed(2);
-      }
-
-      function filterByQuarter(records, quarter) {
-        if (quarter === 'all') return records;
-        const qRanges = {
-          Q1: ['04-06', '07-05'],
-          Q2: ['07-06', '10-05'],
-          Q3: ['10-06', '01-05'],
-          Q4: ['01-06', '04-05']
-        };
-        const [start, end] = qRanges[quarter];
-        return records.filter(r => {
-          const monthDay = r.date.slice(5);
-          if (quarter === 'Q3') return (monthDay >= '10-06' || monthDay <= '01-05');
-          if (quarter === 'Q4') return (monthDay >= '01-06' || monthDay <= '04-05');
-          return monthDay >= start && monthDay <= end;
-        });
-      }
-
-      // ---- Generate quarterly update ----
-      function generateQuarterlyUpdate() {
-        const quarter = document.getElementById('quarter-select').value;
-        const payload = {
-          business: businessProfile,
-          quarter,
-          totals: {
-            income: document.getElementById('total-income').innerText,
-            expenses: document.getElementById('total-expenses').innerText,
-            profit: document.getElementById('net-profit').innerText
-          },
-          timestamp: new Date().toISOString()
-        };
-        alert("Quarterly Update JSON:\n\n" + JSON.stringify(payload, null, 2));
-      }
-
-      // ---- Load data from localStorage ----
-      window.onload = () => {
-        incomes.forEach(i => addRow('income-table', i));
-        expenses.forEach(e => addRow('expense-table', e));
-        updateSummary();
-      };
-    </script>
-  </body>
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      darkModeToggle.textContent =
+        document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    });
+  </script>
+</body>
 </html>
