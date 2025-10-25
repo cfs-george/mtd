@@ -247,7 +247,6 @@
     <form id="incomeForm">
       <input type="date" id="incomeDate" required />
       <input type="number" id="incomeAmount" placeholder="Gross Amount (£)" required />
-      <label class="checkbox-label">Includes VAT?<input type="checkbox" id="incomeVAT" /></label>
       <select id="incomeCategory">
         <option>Consulting</option>
         <option>Sales</option>
@@ -256,6 +255,8 @@
         <option>Other</option>
       </select>
       <input type="text" id="incomeDescription" placeholder="Description" />
+      <label class="checkbox-label">Includes VAT?<input type="checkbox" id="incomeVAT" /></label>
+      <label class="checkbox-label">Was this sold to the EU or Northern Ireland?<input type="checkbox" id="incomeEU" /></label>
       <button type="submit">Add Income</button>
     </form>
     <table id="incomeTable">
@@ -268,7 +269,6 @@
     <form id="expenseForm">
       <input type="date" id="expenseDate" required />
       <input type="number" id="expenseAmount" placeholder="Gross Amount (£)" required />
-      <label class="checkbox-label">Includes VAT?<input type="checkbox" id="expenseVAT" /></label>
       <select id="expenseCategory">
         <option>Travel</option>
         <option>Equipment</option>
@@ -279,6 +279,8 @@
         <option>Other</option>
       </select>
       <input type="text" id="expenseDescription" placeholder="Description" />
+      <label class="checkbox-label">Includes VAT?<input type="checkbox" id="expenseVAT" /></label>
+      <label class="checkbox-label">Was this purchased from the EU or Northern Ireland?<input type="checkbox" id="expenseEU" /></label>
       <button type="submit">Add Expense</button>
     </form>
     <table id="expenseTable">
@@ -325,13 +327,13 @@
       document.getElementById(tabId).classList.add('active');
     }
 
-    function addRecord(type, date, gross, hasVAT, category, desc) {
+    function addRecord(type, date, gross, hasVAT, category, desc, isEU) {
       const rate = vatRate / 100;
       const vat = hasVAT ? (gross - gross / (1 + rate)) : 0;
       const net = gross - vat;
 
-      // Push the record
-      const record = { date, gross, net, vat, category, desc };
+      // Push the record with EU info
+      const record = { date, gross, net, vat, category, desc, eu: isEU };
       records[type].push(record);
 
       // Logging
@@ -344,46 +346,67 @@
       console.log(`Net amount: £${net.toFixed(2)}`);
       console.log(`Category: ${category}`);
       console.log(`Description: ${desc}`);
+      console.log(`EU?: ${isEU}`);
       console.log(`Current ${type} records:`, records[type]);
     }
 
-
+    // Adjust table rendering to include EU column
     function renderTable(type) {
       const table = type === 'income' ? incomeTable : expenseTable;
       const rows = table.querySelectorAll('tr:not(:first-child)');
       rows.forEach(r => r.remove());
+
+      // Insert EU header if not already present
+      if (!table.querySelector('th.eu-col')) {
+        const headerRow = table.rows[0];
+        const euHeader = document.createElement('th');
+        euHeader.textContent = 'EU?';
+        euHeader.classList.add('eu-col');
+        headerRow.appendChild(euHeader);
+      }
+
       records[type].forEach(r => {
         const row = table.insertRow();
-        row.innerHTML = `<td>${r.date}</td><td>£${r.net.toFixed(2)}</td><td>£${r.vat.toFixed(2)}</td><td>${r.category}</td><td>${r.desc}</td>`;
+        row.innerHTML = `<td>${r.date}</td>
+                        <td>£${r.net.toFixed(2)}</td>
+                        <td>£${r.vat.toFixed(2)}</td>
+                        <td>${r.category}</td>
+                        <td>${r.desc}</td>
+                        <td>${r.eu ? '✔' : ''}</td>`;
       });
     }
 
-    function updateSummary() {
-      const startYear = 2025; // Adjust for current year if needed
-      const cutoffDates = [
-        new Date(`${startYear}-07-06`),
-        new Date(`${startYear}-10-06`),
-        new Date(`${startYear+1}-01-06`),
-        new Date(`${startYear+1}-04-06`)
-      ];
-      const upTo = cutoffDates[parseInt(quarterSelect.value)-1];
-      const totalIncome = records.income.filter(r => new Date(r.date) < upTo).reduce((sum,r)=>sum+r.net,0);
-      const totalExpenses = records.expenses.filter(r => new Date(r.date) < upTo).reduce((sum,r)=>sum+r.net,0);
-      totalIncomeEl.textContent = totalIncome.toFixed(2);
-      totalExpensesEl.textContent = totalExpenses.toFixed(2);
-      netTotalEl.textContent = (totalIncome - totalExpenses).toFixed(2);
-    }
-
-    incomeForm.addEventListener('submit', e=>{
+    // Update form submission to pass EU checkbox value
+    incomeForm.addEventListener('submit', e => {
       e.preventDefault();
-      addRecord('income', incomeDate.value, parseFloat(incomeAmount.value), incomeVAT.checked, incomeCategory.value, incomeDescription.value);
-      renderTable('income'); updateSummary(); incomeForm.reset();
+      addRecord(
+        'income',
+        incomeDate.value,
+        parseFloat(incomeAmount.value),
+        incomeVAT.checked,
+        incomeCategory.value,
+        incomeDescription.value,
+        incomeEU.checked
+      );
+      renderTable('income'); 
+      updateSummary(); 
+      incomeForm.reset();
     });
 
-    expenseForm.addEventListener('submit', e=>{
+    expenseForm.addEventListener('submit', e => {
       e.preventDefault();
-      addRecord('expenses', expenseDate.value, parseFloat(expenseAmount.value), expenseVAT.checked, expenseCategory.value, expenseDescription.value);
-      renderTable('expenses'); updateSummary(); expenseForm.reset();
+      addRecord(
+        'expenses',
+        expenseDate.value,
+        parseFloat(expenseAmount.value),
+        expenseVAT.checked,
+        expenseCategory.value,
+        expenseDescription.value,
+        expenseEU.checked
+      );
+      renderTable('expenses'); 
+      updateSummary(); 
+      expenseForm.reset();
     });
 
     profileForm.addEventListener('submit', e=>{
