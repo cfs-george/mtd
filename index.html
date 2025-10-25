@@ -4,12 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MTD Prototype</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
+    * { font-family: "Inter", sans-serif; box-sizing: border-box; }
+
     body {
-      font-family: 'Inter', sans-serif;
       margin: 40px auto;
       max-width: 800px;
       background-color: #f5f7fa;
@@ -24,10 +25,7 @@
       margin-bottom: 20px;
     }
 
-    .dark-mode {
-      background-color: #121212;
-      color: #f0f0f0;
-    }
+    .dark-mode { background-color: #121212; color: #f0f0f0; }
 
     button {
       background: #6CA5AC;
@@ -38,10 +36,7 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
-    button:hover {
-      background: #91e5f0;
-    }
+    button:hover { background: #91e5f0; }
 
     .section {
       margin-top: 20px;
@@ -51,10 +46,7 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
       transition: background-color 0.3s;
     }
-
-    .dark-mode .section {
-      background: #1e1e1e;
-    }
+    .dark-mode .section { background: #1e1e1e; }
 
     input, select {
       padding: 6px;
@@ -62,13 +54,11 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       width: 100%;
-      box-sizing: border-box;
       background: #fff;
       color: #000;
     }
 
-    .dark-mode input,
-    .dark-mode select {
+    .dark-mode input, .dark-mode select {
       background: #2a2a2a;
       color: #fff;
       border-color: #444;
@@ -86,16 +76,10 @@
       text-align: left;
     }
 
-    .dark-mode th, .dark-mode td {
-      border-color: #444;
-    }
+    .dark-mode th, .dark-mode td { border-color: #444; }
 
-    .summary {
-      font-weight: bold;
-      margin-top: 10px;
-    }
+    .summary { font-weight: bold; margin-top: 10px; }
 
-    /* Tabs */
     .tabs {
       display: flex;
       border-bottom: 2px solid #ccc;
@@ -112,10 +96,7 @@
       transition: background 0.2s;
     }
 
-    .tab:hover {
-      background: #d7dde3;
-    }
-
+    .tab:hover { background: #d7dde3; }
     .tab.active {
       background: white;
       border-bottom: 2px solid white;
@@ -127,20 +108,14 @@
       color: #ddd;
       border-color: #444;
     }
-
     .dark-mode .tab.active {
       background: #1e1e1e;
       border-bottom: 2px solid #1e1e1e;
       color: #fff;
     }
 
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .dark-mode-toggle {
       background: none;
@@ -199,7 +174,8 @@
     <h2>Record Income</h2>
     <form id="incomeForm">
       <input type="date" id="incomeDate" required />
-      <input type="number" id="incomeAmount" placeholder="Amount (£)" required />
+      <input type="number" id="incomeAmount" placeholder="Gross Amount (£)" required />
+      <label><input type="checkbox" id="incomeVAT" /> Includes VAT (20%)</label>
       <select id="incomeCategory">
         <option>Consulting</option>
         <option>Sales</option>
@@ -211,7 +187,7 @@
       <button type="submit">Add Income</button>
     </form>
     <table id="incomeTable">
-      <tr><th>Date</th><th>Amount</th><th>Category</th><th>Description</th></tr>
+      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th></tr>
     </table>
   </section>
 
@@ -219,7 +195,8 @@
     <h2>Record Expense</h2>
     <form id="expenseForm">
       <input type="date" id="expenseDate" required />
-      <input type="number" id="expenseAmount" placeholder="Amount (£)" required />
+      <input type="number" id="expenseAmount" placeholder="Gross Amount (£)" required />
+      <label><input type="checkbox" id="expenseVAT" /> Includes VAT (20%)</label>
       <select id="expenseCategory">
         <option>Travel</option>
         <option>Equipment</option>
@@ -233,12 +210,20 @@
       <button type="submit">Add Expense</button>
     </form>
     <table id="expenseTable">
-      <tr><th>Date</th><th>Amount</th><th>Category</th><th>Description</th></tr>
+      <tr><th>Date</th><th>Net (£)</th><th>VAT (£)</th><th>Category</th><th>Description</th></tr>
     </table>
   </section>
 
   <section id="summary" class="section tab-content">
     <h2>Summary</h2>
+    <label>Select Quarter:
+      <select id="quarterSelect">
+        <option value="1">Q1 (6 Apr – 5 Jul)</option>
+        <option value="2">Q2 (6 Jul – 5 Oct)</option>
+        <option value="3">Q3 (6 Oct – 5 Jan)</option>
+        <option value="4">Q4 (6 Jan – 5 Apr)</option>
+      </select>
+    </label>
     <div class="summary">
       Total Income: £<span id="totalIncome">0</span><br>
       Total Expenses: £<span id="totalExpenses">0</span><br>
@@ -256,9 +241,9 @@
     const netTotalEl = document.getElementById('netTotal');
     const darkModeToggle = document.getElementById('darkModeToggle');
     const profileForm = document.getElementById('profileForm');
+    const quarterSelect = document.getElementById('quarterSelect');
 
-    let totalIncome = 0;
-    let totalExpenses = 0;
+    let records = { income: [], expenses: [] };
 
     function showTab(tabId) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -267,33 +252,62 @@
       document.getElementById(tabId).classList.add('active');
     }
 
-    incomeForm.addEventListener('submit', (e) => {
+    function addRecord(type, date, gross, hasVAT, category, desc) {
+      const vat = hasVAT ? (gross - gross / 1.2) : 0;
+      const net = gross - vat;
+      records[type].push({ date, gross, net, vat, category, desc });
+    }
+
+    function renderTable(type) {
+      const table = type === 'income' ? incomeTable : expenseTable;
+      const rows = table.querySelectorAll('tr:not(:first-child)');
+      rows.forEach(r => r.remove());
+
+      records[type].forEach(r => {
+        const row = table.insertRow();
+        row.innerHTML = `<td>${r.date}</td><td>£${r.net.toFixed(2)}</td><td>£${r.vat.toFixed(2)}</td><td>${r.category}</td><td>${r.desc}</td>`;
+      });
+    }
+
+    function updateSummary() {
+      const selectedQuarter = parseInt(quarterSelect.value);
+      const cutoffDates = [
+        new Date('2025-07-06'),
+        new Date('2025-10-06'),
+        new Date('2026-01-06'),
+        new Date('2026-04-06')
+      ];
+
+      const upTo = cutoffDates[selectedQuarter - 1];
+      const totalIncome = records.income
+        .filter(r => new Date(r.date) < upTo)
+        .reduce((sum, r) => sum + r.net, 0);
+      const totalExpenses = records.expenses
+        .filter(r => new Date(r.date) < upTo)
+        .reduce((sum, r) => sum + r.net, 0);
+
+      totalIncomeEl.textContent = totalIncome.toFixed(2);
+      totalExpensesEl.textContent = totalExpenses.toFixed(2);
+      netTotalEl.textContent = (totalIncome - totalExpenses).toFixed(2);
+    }
+
+    incomeForm.addEventListener('submit', e => {
       e.preventDefault();
-      const date = incomeDate.value;
-      const amount = parseFloat(incomeAmount.value);
-      const category = incomeCategory.value;
-      const desc = incomeDescription.value;
-      const row = incomeTable.insertRow();
-      row.innerHTML = `<td>${date}</td><td>£${amount.toFixed(2)}</td><td>${category}</td><td>${desc}</td>`;
-      totalIncome += amount;
+      addRecord('income', incomeDate.value, parseFloat(incomeAmount.value), incomeVAT.checked, incomeCategory.value, incomeDescription.value);
+      renderTable('income');
       updateSummary();
       incomeForm.reset();
     });
 
-    expenseForm.addEventListener('submit', (e) => {
+    expenseForm.addEventListener('submit', e => {
       e.preventDefault();
-      const date = expenseDate.value;
-      const amount = parseFloat(expenseAmount.value);
-      const category = expenseCategory.value;
-      const desc = expenseDescription.value;
-      const row = expenseTable.insertRow();
-      row.innerHTML = `<td>${date}</td><td>£${amount.toFixed(2)}</td><td>${category}</td><td>${desc}</td>`;
-      totalExpenses += amount;
+      addRecord('expenses', expenseDate.value, parseFloat(expenseAmount.value), expenseVAT.checked, expenseCategory.value, expenseDescription.value);
+      renderTable('expenses');
       updateSummary();
       expenseForm.reset();
     });
 
-    profileForm.addEventListener('submit', (e) => {
+    profileForm.addEventListener('submit', e => {
       e.preventDefault();
       document.getElementById('displayName').textContent = businessName.value || 'Not set';
       document.getElementById('displayVAT').textContent = vatNumber.value || 'Not set';
@@ -303,20 +317,13 @@
       profileForm.reset();
     });
 
-    function updateSummary() {
-      totalIncomeEl.textContent = totalIncome.toFixed(2);
-      totalExpensesEl.textContent = totalExpenses.toFixed(2);
-      netTotalEl.textContent = (totalIncome - totalExpenses).toFixed(2);
-    }
+    quarterSelect.addEventListener('change', updateSummary);
 
     const icon = darkModeToggle.querySelector('i');
     darkModeToggle.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
-      if (document.body.classList.contains('dark-mode')) {
-        icon.classList.replace('fa-moon', 'fa-sun');
-      } else {
-        icon.classList.replace('fa-sun', 'fa-moon');
-      }
+      icon.classList.toggle('fa-sun');
+      icon.classList.toggle('fa-moon');
     });
   </script>
 </body>
