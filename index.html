@@ -6,6 +6,7 @@
   <title>MTD Prototype</title>
   <link rel="icon" type="image/x-icon" href="images/cfs_logo_dark_short.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
@@ -153,6 +154,10 @@
       margin-left: 10px;
     }
 
+    .upload {
+      margin-top: 20px;
+    }
+
     .csv-instructions {
       font-size: 0.9rem;
       color: #555;
@@ -253,7 +258,7 @@
     </form>
 
     <hr>
-    <h3>Upload Income CSV</h3>
+    <h3 class="upload">Upload Income CSV/XLSX</h3>
     <p class="csv-instructions">
       Expected format:<br>
       <strong>A:</strong> Date (YYYY-MM-DD), 
@@ -261,10 +266,11 @@
       <strong>C:</strong> Category, 
       <strong>D:</strong> Description, 
       <strong>E:</strong> VAT (Y/N), 
-      <strong>F:</strong> EU (Y/N)
+      <strong>F:</strong> EU (Y/N)<br>
+      Example: 2025-01-01,150.50,Consulting,Client XYZ,Y,N
     </p>
-    <input type="file" id="incomeCSV" accept=".csv" />
-    <button id="importIncomeCSV">Import Income CSV</button>
+    <input type="file" id="incomeCSV" accept=".csv,.xlsx" />
+    <button id="importIncomeCSV">Import Income CSV/XLSX</button>
 
     <div id="incomeTableWrapper"></div>
   </section>
@@ -291,7 +297,7 @@
     </form>
 
     <hr>
-    <h3>Upload Expenses CSV</h3>
+    <h3 class="upload">Upload Expenses CSV/XLSX</h3>
     <p class="csv-instructions">
       Expected format:<br>
       <strong>A:</strong> Date (YYYY-MM-DD), 
@@ -299,10 +305,11 @@
       <strong>C:</strong> Category, 
       <strong>D:</strong> Description, 
       <strong>E:</strong> VAT (Y/N), 
-      <strong>F:</strong> EU (Y/N)
+      <strong>F:</strong> EU (Y/N)<br>
+      Example: 2025-01-01,75.00,Travel,Taxi fare,Y,N
     </p>
-    <input type="file" id="expenseCSV" accept=".csv" />
-    <button id="importExpenseCSV">Import Expenses CSV</button>
+    <input type="file" id="expenseCSV" accept=".csv,.xlsx" />
+    <button id="importExpenseCSV">Import Expenses CSV/XLSX</button>
 
     <div id="expenseTableWrapper"></div>
   </section>
@@ -490,36 +497,81 @@
       return data;
     }
 
-    function handleCSVUpload(fileInput, type) {
+    function formatDate(date) {
+      if (date instanceof Date) {
+        const y = date.getFullYear();
+        const m = ('0' + (date.getMonth() + 1)).slice(-2);
+        const d = ('0' + date.getDate()).slice(-2);
+        return `${y}-${m}-${d}`;
+      }
+      return date;
+    }
+
+    function handleUpload(fileInput, type) {
       const file = fileInput.files[0];
-      if (!file) return alert("Please select a CSV file first.");
+      if (!file) return alert("Please select a file first.");
+      const ext = file.name.split('.').pop().toLowerCase();
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const csvText = e.target.result;
-        const rows = parseCSV(csvText);
-        if (rows.length === 0) {
-          alert("No valid rows found in the CSV file.");
-          return;
-        }
-        rows.forEach(r => {
-          if (r.date && !isNaN(r.gross)) {
-            addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
+      if (ext === 'csv') {
+        reader.onload = (e) => {
+          const csvText = e.target.result;
+          const rows = parseCSV(csvText);
+          if (rows.length === 0) {
+            alert("No valid rows found in the CSV file.");
+            return;
           }
-        });
-        renderTable(type);
-        updateSummary();
-        alert(`${rows.length} ${type} record(s) imported successfully.`);
-      };
-      reader.readAsText(file);
+          rows.forEach(r => {
+            if (r.date && !isNaN(r.gross)) {
+              addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
+            }
+          });
+          renderTable(type);
+          updateSummary();
+          alert(`${rows.length} ${type} record(s) imported successfully.`);
+        };
+        reader.readAsText(file);
+      } else if (ext === 'xlsx') {
+        reader.onload = (e) => {
+          const data = e.target.result;
+          const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false});
+          const dataRows = [];
+          for (const row of rows) {
+            if (row.length < 6) continue;
+            let [date, gross, category, desc, vat, eu] = row;
+            date = formatDate(date);
+            gross = parseFloat(gross);
+            if (isNaN(gross)) continue;
+            const hasVAT = ('' + vat).toUpperCase() === 'Y';
+            const isEU = ('' + eu).toUpperCase() === 'Y';
+            dataRows.push({date, gross, category, desc, hasVAT, isEU});
+          }
+          if (dataRows.length === 0) {
+            alert("No valid rows found in the XLSX file.");
+            return;
+          }
+          dataRows.forEach(r => {
+            addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
+          });
+          renderTable(type);
+          updateSummary();
+          alert(`${dataRows.length} ${type} record(s) imported successfully.`);
+        };
+        reader.readAsBinaryString(file);
+      } else {
+        alert("Unsupported file type.");
+      }
     }
 
     // Event listeners for import buttons
     document.getElementById('importIncomeCSV').addEventListener('click', () => {
-      handleCSVUpload(document.getElementById('incomeCSV'), 'income');
+      handleUpload(document.getElementById('incomeCSV'), 'income');
     });
 
     document.getElementById('importExpenseCSV').addEventListener('click', () => {
-      handleCSVUpload(document.getElementById('expenseCSV'), 'expenses');
+      handleUpload(document.getElementById('expenseCSV'), 'expenses');
     });
 
     // Initial render (empty tables)
