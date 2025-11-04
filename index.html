@@ -280,7 +280,7 @@
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">EU (Y/N)</td>
       </tr>
       <tr style="background: #f9f9f9;">
-        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">01-01-2025</td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">04-11-2025</td>
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">150.50</td>
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">Consulting</td>
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">Client XYZ</td>
@@ -338,7 +338,7 @@
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">EU (Y/N)</td>
       </tr>
       <tr style="background: #f9f9f9;">
-        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">01-01-2025</td>
+        <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">04-11-2025</td>
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">75.00</td>
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">Travel</td>
         <td style="border: 1px solid #ccc; padding: 6px; text-align: center;">Taxi fare</td>
@@ -438,7 +438,7 @@
           <td>£${r.vat.toFixed(2)}</td>
           <td>${r.category}</td>
           <td>${r.desc}</td>
-          <td>${r.eu ? '✔' : ''}</td>
+          <td>${r.eu ? 'Checkmark' : ''}</td>
         `;
       });
 
@@ -514,20 +514,46 @@
       icon.classList.toggle('fa-moon');
     });
 
+    // --- DATE HELPERS ---
+    function parseDate(str) {
+      if (!str) return null;
+      const parts = (''+str).split(/[-\/]/);   // handle - or /
+      if (parts.length !== 3) return null;
+      let day, month, year;
+      if (parts[0].length === 4) {            // YYYY-MM-DD
+        year = parts[0];
+        month = parts[1];
+        day = parts[2];
+      } else {                                // DD-MM-YYYY
+        day = parts[0];
+        month = parts[1];
+        year = parts[2];
+      }
+      month = month.padStart(2, '0');
+      day = day.padStart(2, '0');
+      return `${year}-${month}-${day}`;       // internal format YYYY-MM-DD
+    }
+
+    function formatDisplayDate(date) {
+      const parts = date.split('-');          // YYYY-MM-DD → DD-MM-YYYY
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
     // --- CSV upload handling ---
     function parseCSV(content) {
       const rows = content.trim().split(/\r?\n/).slice(1); // skip header
       const data = [];
       for (const row of rows) {
         const cols = row.split(',').map(c => c.trim());
-        if (cols.length < 6) continue; // skip incomplete rows
+        if (cols.length < 6) continue;
         let [date, gross, category, desc, vat, eu] = cols;
         date = parseDate(date);
+        if (!date) continue;
         const parsed = {
-          date: date,
+          date,
           gross: parseFloat(gross),
-          category: category,
-          desc: desc,
+          category,
+          desc,
           hasVAT: vat.toUpperCase() === 'Y',
           isEU: eu.toUpperCase() === 'Y'
         };
@@ -536,97 +562,56 @@
       return data;
     }
 
-    function formatDate(date) {
-      if (date instanceof Date) {
-        const y = date.getFullYear();
-        const m = ('0' + (date.getMonth() + 1)).slice(-2);
-        const d = ('0' + date.getDate()).slice(-2);
-        return `${y}-${m}-${d}`;
-      }
-      return date;
-    }
-
-    function parseDate(str) {
-      if (!str) return null;
-      const parts = str.split(/[-\/]/); // handle - or /
-      if (parts.length !== 3) return null;
-      let day, month, year;
-      if (parts[0].length === 4) {
-        // YYYY-MM-DD
-        year = parts[0];
-        month = parts[1];
-        day = parts[2];
-      } else {
-        // DD-MM-YYYY
-        day = parts[0];
-        month = parts[1];
-        year = parts[2];
-      }
-      month = month.padStart(2, '0');
-      day = day.padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    function formatDisplayDate(date) {
-      const parts = date.split('-');
-      return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-
+    // --- XLSX upload handling (fixed) ---
     function handleUpload(fileInput, type) {
       const file = fileInput.files[0];
       if (!file) return alert("Please select a file first.");
       const ext = file.name.split('.').pop().toLowerCase();
       const reader = new FileReader();
+
       if (ext === 'csv') {
-        reader.onload = (e) => {
-          const csvText = e.target.result;
-          const rows = parseCSV(csvText);
-          if (rows.length === 0) {
-            alert("No valid rows found in the CSV file.");
-            return;
-          }
+        reader.onload = e => {
+          const rows = parseCSV(e.target.result);
+          if (!rows.length) return alert("No valid rows in CSV.");
           rows.forEach(r => {
-            if (r.date && !isNaN(r.gross)) {
-              addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
-            }
+            if (r.date && !isNaN(r.gross)) addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
           });
           renderTable(type);
           updateSummary();
-          alert(`${rows.length} ${type} record(s) imported successfully.`);
+          alert(`${rows.length} ${type} record(s) imported.`);
         };
         reader.readAsText(file);
       } else if (ext === 'xlsx') {
-        reader.onload = (e) => {
+        reader.onload = e => {
           const data = e.target.result;
           const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
-          const sheetName = workbook.SheetNames[0];
-          const sheet = workbook.Sheets[sheetName];
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(sheet, {header: 1, raw: false}).slice(1); // skip header
           const dataRows = [];
+
           for (const row of rows) {
             if (row.length < 6) continue;
-            let [date, gross, category, desc, vat, eu] = row;
-            if (date instanceof Date) {
-              date = formatDate(date);
-            } else {
-              date = parseDate(date);
-            }
+            let [dateCell, gross, category, desc, vat, eu] = row;
+
+            // **KEY FIX** – always turn the raw cell into a string first
+            const dateStr = String(dateCell);
+            const date = parseDate(dateStr);
+            if (!date) continue;
+
             gross = parseFloat(gross);
             if (isNaN(gross)) continue;
+
             const hasVAT = ('' + vat).toUpperCase() === 'Y';
-            const isEU = ('' + eu).toUpperCase() === 'Y';
+            const isEU   = ('' + eu).toUpperCase() === 'Y';
+
             dataRows.push({date, gross, category, desc, hasVAT, isEU});
           }
-          if (dataRows.length === 0) {
-            alert("No valid rows found in the XLSX file.");
-            return;
-          }
-          dataRows.forEach(r => {
-            addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
-          });
+
+          if (!dataRows.length) return alert("No valid rows in XLSX.");
+          dataRows.forEach(r => addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU));
           renderTable(type);
           updateSummary();
-          alert(`${dataRows.length} ${type} record(s) imported successfully.`);
+          alert(`${dataRows.length} ${type} record(s) imported.`);
         };
         reader.readAsBinaryString(file);
       } else {
@@ -643,7 +628,7 @@
       handleUpload(document.getElementById('expenseCSV'), 'expenses');
     });
 
-    // Initial render (empty tables)
+    // Initial render
     renderTable('income');
     renderTable('expenses');
   </script>
