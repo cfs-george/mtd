@@ -234,6 +234,8 @@
   <!-- Expenses -->
   <section id="expenses" class="section tab-content">
     <h2>Record Expense</h2>
+
+    <!-- Single Expense Entry -->
     <form id="expenseForm">
       <input type="date" id="expenseDate" required />
       <input type="number" id="expenseAmount" placeholder="Gross Amount (£)" required />
@@ -251,6 +253,30 @@
       <label class="checkbox-label">Purchased from EU or NI?<input type="checkbox" id="expenseEU" /></label>
       <button type="submit">Add Expense</button>
     </form>
+
+    <hr style="margin:20px 0;">
+
+    <!-- Multi Expense Entry -->
+    <h3>Add Multiple Expenses</h3>
+    <form id="multiExpenseForm">
+      <label>Category:</label>
+      <select id="multiExpenseCategory" required>
+        <option value="">Select Category</option>
+        <option>Travel</option>
+        <option>Equipment</option>
+        <option>Office Supplies</option>
+        <option>Utilities</option>
+        <option>Marketing</option>
+        <option>Professional Fees</option>
+        <option>Other</option>
+      </select>
+
+      <div id="multiExpenseRows"></div>
+
+      <button type="button" id="addExpenseRow">+ Add Row</button>
+      <button type="submit">Add All Expenses</button>
+    </form>
+
     <div id="expenseTableWrapper"></div>
   </section>
   <!-- Summary -->
@@ -413,6 +439,55 @@
       document.body.classList.toggle('dark-mode');
       icon.classList.toggle('fa-sun');
       icon.classList.toggle('fa-moon');
+    });
+
+    // MULTI EXPENSE ENTRY LOGIC
+    const multiExpenseForm = document.getElementById('multiExpenseForm');
+    const multiExpenseRows = document.getElementById('multiExpenseRows');
+    const addExpenseRowBtn = document.getElementById('addExpenseRow');
+
+    function createExpenseRow() {
+      const div = document.createElement('div');
+      div.style.marginBottom = '8px';
+      div.innerHTML = `
+        <input type="date" class="multi-date" required style="width:150px;" />
+        <input type="number" class="multi-amount" placeholder="Amount (£)" required style="width:120px;" />
+        <input type="text" class="multi-desc" placeholder="Description" style="width:180px;" />
+        <label style="font-size:0.9rem;">VAT?<input type="checkbox" class="multi-vat"></label>
+        <label style="font-size:0.9rem;">EU?<input type="checkbox" class="multi-eu"></label>
+        <button type="button" class="remove-row" style="margin-left:8px;">🗑️</button>
+      `;
+      div.querySelector('.remove-row').addEventListener('click', () => div.remove());
+      return div;
+    }
+
+    addExpenseRowBtn.addEventListener('click', () => {
+      multiExpenseRows.appendChild(createExpenseRow());
+    });
+
+    // Handle batch submission
+    multiExpenseForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const category = document.getElementById('multiExpenseCategory').value;
+      const rows = multiExpenseRows.querySelectorAll('div');
+      if (!category || rows.length === 0) {
+        alert('Please select a category and add at least one expense.');
+        return;
+      }
+      rows.forEach(row => {
+        const date = row.querySelector('.multi-date').value;
+        const amount = parseFloat(row.querySelector('.multi-amount').value);
+        const desc = row.querySelector('.multi-desc').value;
+        const vat = row.querySelector('.multi-vat').checked;
+        const eu = row.querySelector('.multi-eu').checked;
+        if (date && amount) {
+          addRecord('expenses', date, amount, vat, category, desc, eu);
+        }
+      });
+      renderTable('expenses');
+      updateSummary();
+      multiExpenseForm.reset();
+      multiExpenseRows.innerHTML = '';
     });
 
     // Initial render (empty tables)
