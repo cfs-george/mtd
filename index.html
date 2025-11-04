@@ -595,7 +595,9 @@
 
             // **KEY FIX** – always turn the raw cell into a string first
             const dateStr = String(dateCell);
+            console.log(dateStr);
             const date = parseDate(dateStr);
+            console.log(date);
             if (!date) continue;
 
             gross = parseFloat(gross);
