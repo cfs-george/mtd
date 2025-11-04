@@ -595,18 +595,39 @@
     function handleUpload(fileInput, type) {
       const file = fileInput.files[0];
       if (!file) return alert("Please select a file first.");
+
       const ext = file.name.split('.').pop().toLowerCase();
       if (ext !== 'csv') return alert("Unsupported file type.");
+
       const reader = new FileReader();
       reader.onload = e => {
-        const rows = parseCSV(e.target.result);
-        if (!rows.length) return alert("No valid rows in CSV.");
-        rows.forEach(r => {
-          if (r.date && !isNaN(r.gross)) addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
+        const parsed = parseCSV(e.target.result);      // all rows after header
+        if (!parsed.length) return alert("No rows found in CSV (or only a header).");
+
+        let validCount   = 0;
+        let ignoredCount = 0;
+
+        parsed.forEach(r => {
+          if (r.date && !isNaN(r.gross)) {
+            addRecord(type, r.date, r.gross, r.hasVAT, r.category, r.desc, r.isEU);
+            validCount++;
+          } else {
+            ignoredCount++;
+          }
         });
+
         renderTable(type);
         updateSummary();
-        alert(`${rows.length} ${type} record(s) imported.`);
+
+        // ---- Clear user message ----
+        if (ignoredCount === 0) {
+          alert(`${validCount} ${type} record(s) imported successfully.`);
+        } else {
+          alert(
+            `${validCount} ${type} record(s) imported.\n` +
+            `${ignoredCount} row(s) ignored (missing date or amount).`
+          );
+        }
       };
       reader.readAsText(file);
     }
